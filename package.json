@@ -1,0 +1,19 @@
+{
+  "name": "ai-knowledge-assistant",
+  "version": "1.0.0",
+  "description": "AI Knowledge Assistant – Reducing Unsupported Responses in Generative AI",
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build",
+    "start": "node backend/server.js",
+    "server": "node backend/server.js",
+    "client": "cd frontend && npm run dev",
+    "dev": "node backend/server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mongoose": "^8.4.1",
+    "morgan": "^1.10.0"
+  }
+}
