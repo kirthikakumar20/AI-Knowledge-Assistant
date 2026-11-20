@@ -1,10 +1,29 @@
 const Knowledge = require('../models/Knowledge');
 const { retrieveKnowledge } = require('../services/retrievalService');
+const { sampleKnowledge } = require('../seed/seedData');
+const mongoose = require('mongoose');
 
 // GET all knowledge entries with search and filter
 const getKnowledgeList = async (req, res) => {
   try {
     const { category, search } = req.query;
+
+    if (mongoose.connection.readyState !== 1) {
+      let filtered = [...sampleKnowledge];
+      if (category && category !== 'All') {
+        filtered = filtered.filter(k => k.category === category);
+      }
+      if (search && search.trim() !== '') {
+        const q = search.toLowerCase();
+        filtered = filtered.filter(k => k.title.toLowerCase().includes(q) || k.fact.toLowerCase().includes(q));
+      }
+      return res.status(200).json({
+        success: true,
+        count: filtered.length,
+        data: filtered,
+      });
+    }
+
     const filter = {};
 
     if (category && category !== 'All') {

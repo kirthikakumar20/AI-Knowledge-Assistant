@@ -1,4 +1,6 @@
 const KnowledgeGraph = require('../models/KnowledgeGraph');
+const { sampleGraph } = require('../seed/seedData');
+const mongoose = require('mongoose');
 
 /**
  * Knowledge Graph Exploration Service
@@ -6,7 +8,13 @@ const KnowledgeGraph = require('../models/KnowledgeGraph');
  */
 async function exploreGraphForQuery(queryTokens, matchedFacts = []) {
   try {
-    const graphDoc = await KnowledgeGraph.findOne().lean();
+    let graphDoc = null;
+    if (mongoose.connection.readyState === 1) {
+      graphDoc = await KnowledgeGraph.findOne().lean();
+    }
+    if (!graphDoc) {
+      graphDoc = sampleGraph;
+    }
     if (!graphDoc || !graphDoc.nodes || !graphDoc.edges) {
       return {
         path: [],

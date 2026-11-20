@@ -1,4 +1,6 @@
 const Knowledge = require('../models/Knowledge');
+const { sampleKnowledge } = require('../seed/seedData');
+const mongoose = require('mongoose');
 
 // Common English stopwords to filter out
 const STOP_WORDS = new Set([
@@ -44,8 +46,19 @@ async function retrieveKnowledge(queryText) {
     };
   }
 
-  // Fetch all verified knowledge entries from MongoDB
-  const allKnowledge = await Knowledge.find({ verified: true }).lean();
+  // Fetch all verified knowledge entries from MongoDB (or resilient fallback if DB disconnected)
+  let allKnowledge = [];
+  try {
+    if (mongoose.connection.readyState === 1) {
+      allKnowledge = await Knowledge.find({ verified: true }).lean();
+    }
+    if (!allKnowledge || allKnowledge.length === 0) {
+      allKnowledge = sampleKnowledge;
+    }
+  } catch (dbErr) {
+    console.warn('[Retrieval DB Warning] Falling back to verified canonical records:', dbErr.message);
+    allKnowledge = sampleKnowledge;
+  }
 
   const scoredFacts = [];
 

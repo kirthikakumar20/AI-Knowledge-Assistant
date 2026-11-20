@@ -1,9 +1,22 @@
 const KnowledgeGraph = require('../models/KnowledgeGraph');
 const { sampleGraph } = require('../seed/seedData');
+const mongoose = require('mongoose');
 
 // GET full knowledge graph structure
 const getGraphData = async (req, res) => {
   try {
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(200).json({
+        success: true,
+        data: {
+          name: sampleGraph.name,
+          version: sampleGraph.version,
+          nodes: sampleGraph.nodes,
+          edges: sampleGraph.edges,
+        },
+      });
+    }
+
     let graph = await KnowledgeGraph.findOne().lean();
     if (!graph) {
       graph = await KnowledgeGraph.create(sampleGraph);
